@@ -29,22 +29,20 @@ OuterList.prototype.show = function(){
   var _this = this;
   var initialCount = this.list.data("initial-items-count");
 
-  this.list.find("li").each(function(index, item){
+  var x = this.list.find("li")
+  x.each(function(index, item){
     if(!$(item).data("priority-order")){
-      $(item).css("display", "none");
+      $(item).data("priority-order", 0);
     }
   });
-
-  var prioritySortedList = this.sortByPriority();
-
-  var countList = prioritySortedList.slice(0, initialCount);
-  var hideList = prioritySortedList.slice(initialCount, prioritySortedList.length);
-  $(countList).each(function(index, item){
+  var sorted = this.sortByPriority().reverse();
+  var visibleList = sorted.slice(0, initialCount);
+  var hiddenList = sorted.slice(initialCount, sorted.length);
+  hiddenList.forEach(function(item, index){
+    $(item).hide();
+  })
+  visibleList.forEach(function(item, index){
     _this.list.append($(item));
-  });
-
-  $(hideList).each(function(index, item){
-    $(item).css("display", "none");
   })
 }
 
@@ -80,13 +78,7 @@ OuterList.prototype.bindClickEvent = function(){
 }
 
 OuterList.prototype.sortByPriority = function(){
-  var priority = this.list.find("li").map(function(index, item){
-    if($(item).data("priority-order")){
-      return item;
-    }
-  });
-
-  priority = priority.toArray();
+  priority = this.list.find("li").toArray();
   priority.sort(function(listItem1, listItem2){
     var first = $(listItem1).data("priority-order");
     var second = $(listItem2).data("priority-order");
